@@ -44,7 +44,7 @@ exports.makeuppercase = onDocumentCreated("/messages/{documentId}", (event) => {
 
 exports.phones = onRequest(async (req, res) => {
   cors(req, res, async () => {
-    try {cd
+    try {
       // Retrieve data from the 'phones' collection
       const phonesSnapshot = await getFirestore().collection("phones").get();
       // Create an array to store phone data
