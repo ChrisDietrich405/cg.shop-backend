@@ -74,10 +74,17 @@ exports.createclient = onRequest(async (req, res) => {
     }
 
     try {
+      // Create a reference to the cities collection
+      const clientsRef = getFirestore().collection("clients");
+
+      const existingClient = await clientsRef.where("email", "==", email).get();
+
+      if (!existingClient.empty) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
       // Retrieve data from the 'phones' collection
-      const newClient = await getFirestore()
-        .collection("clients")
-        .add({ name, email, phone, password });
+      const newClient = await clientsRef.add({ name, email, phone, password });
 
       const { id } = newClient;
       const clientObject = {
@@ -97,41 +104,24 @@ exports.createclient = onRequest(async (req, res) => {
 
 exports.login = onRequest(async (req, res) => {
   cors(req, res, async () => {
-    // const { email, password } = req.body;
-    console.log("EMAIL", req.body.email);
+    const { email, password } = req.body;
 
-    // Create a reference to the cities collection
-    const clientsRef = getFirestore().collection("clients");
-
-    // Create a query against the collection
-    const findUser = await clientsRef
-      .where("email", "==", "chrisdietrich3666@gmail.com")
-      .get();
-
-    if (findUser.empty) {
-      console.log("No matching documents.");
-      return;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Add email and password" });
     }
 
-    findUser.forEach((doc) => {
-      console.log(doc.id, "=>", doc.data());
-    });
-
-    console.log(findUser);
-
     try {
-      // const existingUser = await getFirestore().collection("clients");
-      // const newClient = await getFirestore()
-      //   .collection("clients")
-      //   .add({ name, email, phone, password });
-      // const { id } = newClient;
-      // const clientObject = {
-      //   id,
-      //   name,
-      //   email,
-      //   phone,
-      // };
-      // res.status(200).json(clientObject);
+      // Create a reference to the cities collection
+      const clientsRef = getFirestore().collection("clients");
+
+      // Create a query against the collection
+      const findUser = await clientsRef.where("email", "==", email).get();
+
+      if (findUser.empty) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      return res.status(200).json(findUser.docs[0].data());
     } catch (error) {
       console.error("Error retrieving data from Firestore:", error);
       // res.status(500).json({ error: "Internal server error" });
