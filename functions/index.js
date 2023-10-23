@@ -116,6 +116,7 @@ exports.login = onRequest(async (req, res) => {
 
       // Create a query against the collection
       const findUser = await clientsRef.where("email", "==", email).get();
+      
 
       if (findUser.empty) {
         return res.status(401).json({ message: "Unauthorized" });
