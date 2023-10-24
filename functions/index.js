@@ -73,8 +73,22 @@ exports.createclient = onRequest(async (req, res) => {
       res.status(400).json("Add information");
     }
 
+    if (phone.length < 7) {
+      res.status(400).json("Phone number needs to be at least 7 digits");
+    }
+
+    if (password.length < 7) {
+      res.status(400).json("Password needs to be at least 7 characters");
+    }
+
+    
+
+    const numbers = /^[0-9]+$/;
+    if (!phone.match(numbers)) {
+      res.status(400).json("Phone number can only include numbers");
+    }
+
     try {
-      // Create a reference to the cities collection
       const clientsRef = getFirestore().collection("clients");
 
       const existingClient = await clientsRef.where("email", "==", email).get();
@@ -116,7 +130,6 @@ exports.login = onRequest(async (req, res) => {
 
       // Create a query against the collection
       const findUser = await clientsRef.where("email", "==", email).get();
-      
 
       if (findUser.empty) {
         return res.status(401).json({ message: "Unauthorized" });
