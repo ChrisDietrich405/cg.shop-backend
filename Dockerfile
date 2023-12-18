@@ -8,8 +8,10 @@ COPY . .
 
 COPY firebase-credentials.json .
 
+RUN npm install 
+
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/firebase-credentials.json
 
-
+EXPOSE 5000 5001 9005
 
 CMD ["firebase", "serve", "--only", "functions"]
